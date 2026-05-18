@@ -75,11 +75,11 @@ class AttendanceCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: Colors.green.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   'Present',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: Colors.green.shade700,
                     fontWeight: FontWeight.w700,
                   ),
