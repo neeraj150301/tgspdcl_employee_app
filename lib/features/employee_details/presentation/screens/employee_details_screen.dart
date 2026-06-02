@@ -55,7 +55,7 @@ class EmployeeDetailsScreen extends StatelessWidget {
                     child: const CircleAvatar(
                       radius: 52,
                       backgroundImage: NetworkImage(
-                        'https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                        'https://thumbs.dreamstime.com/b/handsome-indian-man-meditating-under-tree-27166536.jpg?w=576',
                       ),
                     ),
                   ),
@@ -66,7 +66,7 @@ class EmployeeDetailsScreen extends StatelessWidget {
                   /// NAME
                   ///
                   Text(
-                    'John Doe',
+                    'Neeraj Sharma',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
@@ -157,13 +157,13 @@ class EmployeeDetailsScreen extends StatelessWidget {
               children: const [
                 InfoTile(
                   label: 'Full Name',
-                  value: 'John Doe',
+                  value: 'Neeraj Sharma',
                   icon: Icons.badge_rounded,
                 ),
 
                 InfoTile(
                   label: 'Father Name',
-                  value: 'Michael Doe',
+                  value: 'Deepak Sharma',
                   icon: Icons.family_restroom,
                 ),
 
@@ -204,7 +204,7 @@ class EmployeeDetailsScreen extends StatelessWidget {
 
                 InfoTile(
                   label: 'Email Address',
-                  value: 'john.doe@gmail.com',
+                  value: 'neeraj.sharma@gmail.com',
                   icon: Icons.email_rounded,
                 ),
 

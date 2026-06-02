@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -20,32 +21,67 @@ class AttendanceActionScreen extends ConsumerStatefulWidget {
 }
 
 class _AttendanceActionScreenState
-    extends ConsumerState<AttendanceActionScreen> {
+    extends ConsumerState<AttendanceActionScreen> with WidgetsBindingObserver {
+  bool _isLocationDialogShowing = false;
+  BuildContext? _dialogContext;
+  StreamSubscription<ServiceStatus>? _serviceStatusStream;
+
   @override
   void initState() {
     super.initState();
-  _listenLocationErrors();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(() {
+      ref.read(attendanceProvider.notifier).clearCapturedFace();
       ref.read(attendanceProvider.notifier).fetchLocation();
+    });
+
+    _serviceStatusStream = Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
+      if (status == ServiceStatus.enabled) {
+        _dismissDialogAndFetchLocation();
+      }
     });
   }
 
-  void _listenLocationErrors() {
-  ref.listenManual(
-    attendanceProvider,
-    (previous, next) async {
-      if (next.error == 'LOCATION_DISABLED') {
-        _showLocationDialog();
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _serviceStatusStream?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkLocationStatus();
+    }
+  }
+
+  Future<void> _checkLocationStatus() async {
+    final enabled = await Geolocator.isLocationServiceEnabled();
+    if (enabled) {
+      _dismissDialogAndFetchLocation();
+    }
+  }
+
+  void _dismissDialogAndFetchLocation() {
+    if (_isLocationDialogShowing && _dialogContext != null) {
+      if (Navigator.canPop(_dialogContext!)) {
+        Navigator.pop(_dialogContext!);
       }
-    },
-  );
-}
+      _dialogContext = null;
+      _isLocationDialogShowing = false;
+      ref.read(attendanceProvider.notifier).fetchLocation();
+    }
+  }
 
 Future<void> _showLocationDialog() async {
-  showDialog(
+  if (_isLocationDialogShowing) return;
+  _isLocationDialogShowing = true;
+  await showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (_) {
+    builder: (ctx) {
+      _dialogContext = ctx;
       return PopScope(
         canPop: false,
         child: Dialog(
@@ -141,15 +177,8 @@ Future<void> _showLocationDialog() async {
                           await Geolocator
                               .isLocationServiceEnabled();
 
-                      if (enabled && mounted) {
-                        Navigator.pop(context);
-
-                        ref
-                            .read(
-                              attendanceProvider
-                                  .notifier,
-                            )
-                            .fetchLocation();
+                      if (enabled) {
+                        _dismissDialogAndFetchLocation();
                       }
                     },
                     icon: const Icon(
@@ -167,10 +196,18 @@ Future<void> _showLocationDialog() async {
       );
     },
   );
+  _dialogContext = null;
+  _isLocationDialogShowing = false;
 }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(attendanceProvider, (previous, next) {
+      if (previous?.error != 'LOCATION_DISABLED' && next.error == 'LOCATION_DISABLED') {
+        _showLocationDialog();
+      }
+    });
+
     final state = ref.watch(attendanceProvider);
 
     return Scaffold(

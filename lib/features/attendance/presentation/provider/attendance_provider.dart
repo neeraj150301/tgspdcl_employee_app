@@ -41,6 +41,25 @@ class AttendanceNotifier extends StateNotifier<AttendanceState> {
     );
   }
 
+  void clearCapturedFace() {
+    state = AttendanceState(
+      loading: state.loading,
+      locationLoading: state.locationLoading,
+      verifying: state.verifying,
+      success: state.success,
+      latitude: state.latitude,
+      longitude: state.longitude,
+      address: state.address,
+      capturedFace: null,
+      faceMatched: state.faceMatched,
+      locationCaptured: state.locationCaptured,
+      checkedIn: state.checkedIn,
+      checkInTime: state.checkInTime,
+      checkOutTime: state.checkOutTime,
+      error: state.error,
+    );
+  }
+
   bool validateAttendance() {
     if (!state.locationCaptured) {
       return false;
